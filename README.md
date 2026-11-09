@@ -111,7 +111,7 @@ DB Insights operates on a decoupled architecture, orchestrating AI generation an
 1. **Clone the Repo**
 
    ```bash
-   git clone https://github.com/your-username/db-insights.git
+   git clone https://github.com/Muh-Khalil/db-insights.git
    cd db-insights
    ```
 2. **Setup Dependencies**
