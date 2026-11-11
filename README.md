@@ -1,146 +1,187 @@
-<div align="center">
-  <img src="./public/logo.png" alt="DB Insights Logo" width="120" />
+# 🔍 DB Insights — Plain English to Database Queries
 
-# DB Insights
-
-  **The Intelligent Bridge Between Natural Language and Your Database.**
-
-  [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-  [![Lucide Icons](https://img.shields.io/badge/Lucide_Icons-Latest-FF00AD?style=for-the-badge&logo=lucide)](https://lucide.dev/)
-
-<img src="./public/dashboard.png" alt="DB Insights Dashboard" width="100%" style="border-radius: 12px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.1);" />
-
-<p><strong>Transform plain English into actionable SQL queries instantly.</strong></p>
-  <p>Query, visualize, and analyze your data via <strong>zero-telemetry</strong> infrastructure powered by local AI.</p>
-  <h1>DB Insights</h1>
-  <p><strong>Transform plain English into actionable database queries instantly.</strong></p>
-  <p>
-    <a href="#features">Features</a> •
-    <a href="#architecture">Architecture</a> •
-    <a href="#quick-start">Quick Start</a> •
-    <a href="#cli">CLI Options</a> •
-    <a href="#contributing">Contributing</a>
-  </p>
-
-</div>
+Ask questions in plain English and get instant database insights, powered by a **local AI model** (Ollama/Qwen).
 
 ---
 
-## 📱 Mobile-First Intelligence
+## ✨ Features
 
-Designed for the modern developer, DB Insights features a high-performance, fully responsive interface that brings the power of AI database analysis to your pocket.
-
-<div align="center">
-  <img src="./public/phone-view.png" alt="DB Insights Mobile View" width="320" style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" />
-</div>
-
----
-
-## ✨ Core Capabilities
-
-### 🧠 AI-Native SQL Synthesis
-
-Say goodbye to complex syntax. Employs context-aware prompt parsing to generate precise `SELECT` statements from natural language. Optimized for **Ollama** and **Qwen2.5-Coder**.
-
-### 🗄️ Universal Multi-Engine Connectivity
-
-Connect directly to your active environments with support for:
-
-- 🐬 **MySQL**
-- 🐘 **PostgreSQL**
-- 🍃 **MongoDB** (Pipeline enabled)
-
-### 📊 Advanced Data Storytelling
-
-Visualize your query results with high-fidelity components:
-
-- **Interactive Tables**: High-density data views with horizontal scrolling.
-- **Dynamic Charts**: Instant Bar, Line, and Pie visualizations via Recharts.
-- **Tree-View JSON**: Explorable structural data for deep debugging.
-
-### 🛡️ Zero-Trust Security Model
-
-Safety is non-negotiable.
-
-- **Read-Only Enforcement**: Strict pattern matching blocks `DROP`, `DELETE`, `UPDATE`, and `ALTER`.
-- **Local-First Data Plane**: 100% of execution and AI inference stays on your infrastructure.
-- **Resource Constraints**: Server-side row caps and statement timeouts prevent engine overload.
+- 🗣️ **Plain English → SQL** — Type natural language, AI generates SQL
+- 🛡️ **Query Safety Guardrails** — Blocks DELETE/DROP/UPDATE, detects injection attempts
+- 📊 **Multiple Visualizations** — Table, Bar/Line/Pie charts, JSON view
+- 📥 **CSV Export** — Download query results instantly
+- 🎮 **Demo Mode** — Built-in e-commerce database, no setup needed
+- 🔐 **100% Local** — No data sent to external services
+- 🗄️ **Multi-DB** — MySQL, PostgreSQL, SQLite
+- 🤖 **AI Insights** — LLM analyzes results in plain English
+- 📜 **Query History** — Browse and re-run past queries
 
 ---
 
-## 🏗️ Architecture Stack
+## 🚀 Quick Start
 
-DB Insights operates on a decoupled architecture, orchestrating AI generation and DB execution through Next.js server endpoints to ensure client isolation.
-
-```text
-                        ┌───────────────────────────────┐
-                        │      DB Insights Client       │
-                        │    (Web UI / CLI Module)      │
-                        └───────┬─────────────▲─────────┘
-                                │             │
- [Natural Language Query]       │             │       [AI Synopsis]
-                                │             │
-                        ┌───────▼─────────────┴─────────┐
-                        │       Next.js API Layer       │
-                        │                               │
-                        │  1. /api/schema               │
-                        │  2. /api/generate (LLM)       │
-                        │  3. /api/execute (Driver)     │
-                        │  4. /api/insights (Analysis)  │
-                        └───────┬─────────────┬─────────┘
-                                │             │
-                        ┌───────▼────┐   ┌────▼────────┐
-                        │ Local LLM  │   │  DB Engine  │
-                        │ (Ollama)   │   │ (PG/MySQL)  │
-                        └────────────┘   └─────────────┘
-```
-
----
-
-## 🚀 Getting Started
-
-### 1. Prerequisites
-
-* **Node.js**: 20.x or higher
-* **Local LLM**: [Ollama](https://ollama.ai/) running with `qwen2.5-coder:7b` (recommended)
-
-### 2. Installation
-
-1. **Clone the Repo**
-
-   ```bash
-   git clone https://github.com/your-username/db-insights.git
-   cd db-insights
-   ```
-2. **Setup Dependencies**
-
-   ```bash
-   npm install
-   ```
-3. **Fire it up**
-
-   ```bash
-   npm run dev
-   ```
-
-Visit `http://localhost:3000` to start querying.
-
----
-
-## 💻 CLI Integration
-
-For power users, DB Insights includes a standalone CLI for terminal-native analysis.
+### 1. Start the App
 
 ```bash
-cd cli
-npm link
-dbi ask "Who are my most active users?"
+cd db-insights
+npm run dev
+```
+
+Open http://localhost:3500
+
+### 2. Try Demo Mode
+
+Click **"Try Demo Mode"** on the home screen — no database or Ollama required!
+
+The demo has a full e-commerce database with:
+- `users` — 10 customers from various countries
+- `products` — 10 products in multiple categories
+- `orders` — 15 orders with status tracking
+- `order_items` — Line items linking products to orders
+
+### 3. Use with Your Own Database
+
+Connect MySQL, PostgreSQL, or SQLite by filling in the connection form.
+
+---
+
+## 🤖 LLM Setup (Ollama)
+
+For AI-powered query generation, install [Ollama](https://ollama.ai):
+
+```bash
+# Install Ollama from https://ollama.ai/download
+
+# Start the Ollama server
+ollama serve
+
+# Pull a coding model (recommended)
+ollama pull qwen2.5-coder:7b
+
+# Alternatives
+ollama pull codellama:7b
+ollama pull llama3.2:3b
+```
+
+> **Without Ollama**: Demo mode still works! You can also write SQL manually using the "Write SQL manually" option in the query interface.
+
+---
+
+## 🏗️ Architecture
+
+```
+User (Plain English Question)
+        ↓
+  Next.js Frontend
+        ↓
+  /api/schema  → Schema Discovery (reads DB structure)
+        ↓
+  /api/generate → LLM Query Generation (Ollama local model)
+        ↓
+  /api/validate → Safety Validation (blocks dangerous queries)
+        ↓
+  /api/execute  → Query Execution (runs SELECT on your DB)
+        ↓
+  /api/insights → AI Result Analysis (Ollama summarizes findings)
+        ↓
+  Results: Table / Chart / JSON + AI Summary
 ```
 
 ---
 
-<div align="center">
-  <p>Built with ❤️ for Data Engineers & Developers</p>
-</div>
+## 🔒 Security Model
+
+| Check | What it does |
+|-------|-------------|
+| **Blocked keywords** | Rejects DELETE, DROP, UPDATE, INSERT, TRUNCATE, ALTER |
+| **Statement limit** | Only one SQL statement allowed per query |
+| **Injection detection** | Detects hex encoding, CHAR(), suspicious comment patterns |
+| **LIMIT enforcement** | Warns when no LIMIT clause is present |
+| **Double validation** | Validated on frontend → re-validated server-side before execution |
+| **Read-only mode** | SQLite opened with `{ readonly: true }` |
+| **Query timeout** | MySQL: MAX_EXECUTION_TIME, PostgreSQL: statement_timeout |
+| **Row cap** | Maximum 1000 rows returned per query |
+
+---
+
+## 📁 Project Structure
+
+```
+db-insights/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── schema/     # Database schema discovery
+│   │   │   ├── generate/   # LLM SQL generation
+│   │   │   ├── validate/   # Query safety validation
+│   │   │   ├── execute/    # Query execution
+│   │   │   ├── insights/   # AI result analysis
+│   │   │   ├── demo/       # Built-in demo database
+│   │   │   └── ollama/     # Ollama status check
+│   │   ├── globals.css     # Dark theme + glassmorphism styles
+│   │   ├── layout.tsx      # Root layout
+│   │   └── page.tsx        # Main application page
+│   ├── components/
+│   │   ├── DbConnect.tsx      # Database connection form
+│   │   ├── SchemaViewer.tsx   # Collapsible schema tree
+│   │   ├── QueryInterface.tsx # Main query + results orchestrator
+│   │   ├── ResultsViewer.tsx  # Table/Chart/JSON viewer
+│   │   ├── Pipeline.tsx       # Processing step visualizer
+│   │   └── QueryHistory.tsx   # Past queries sidebar
+│   └── types/
+│       └── index.ts           # All TypeScript types
+├── next.config.ts
+└── package.json
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 15, React, TypeScript |
+| Styling | Vanilla CSS (glassmorphism dark theme) |
+| Charts | Recharts |
+| Icons | Lucide React |
+| LLM Runtime | Ollama (local) |
+| LLM Model | Qwen2.5-Coder (recommended) |
+| Databases | MySQL (mysql2), PostgreSQL (pg), SQLite (better-sqlite3) |
+
+---
+
+## 📝 Example Questions
+
+Try these in Demo Mode:
+
+- *"Show me the top 5 customers by revenue"*
+- *"What are the best selling product categories?"*
+- *"How many orders are pending vs completed?"*
+- *"Which country generates the most revenue?"*
+- *"Find all products with less than 50 units in stock"*
+- *"Show me orders from the last 30 days"*
+
+---
+
+## ⚠️ Limitations (MVP)
+
+- LLM accuracy depends on model quality and schema complexity
+- Very complex multi-table queries may require prompt tuning
+- No authentication layer (add this before production use)
+- SQLite must be accessible on the server's file system
+
+---
+
+## 🔮 Roadmap
+
+- [ ] Query cost estimation before execution
+- [ ] Fine-tuned prompts per database type
+- [ ] Natural language filter refinement ("now filter by USA only")
+- [ ] Saved query templates
+- [ ] Multi-database joins
+- [ ] Authentication + user permissions
+- [ ] Scheduled query reports
+
+---
+
+*Built with ❤️ using Next.js + Ollama + Local AI.*

@@ -149,49 +149,53 @@ async function getPostgreSQLSchema(config: DatabaseConfig): Promise<SchemaInfo> 
     }
 }
 
-async function getMongoDBSchema(config: DatabaseConfig): Promise<SchemaInfo> {
-    const { MongoClient } = await import('mongodb');
-    if (!config.uri) {
-        throw new Error('MongoDB URI is required');
-    }
-    
-    const client = new MongoClient(config.uri, { serverSelectionTimeoutMS: 5000 });
+async function getSQLiteSchema(config: DatabaseConfig): Promise<SchemaInfo> {
+    const Database = (await import('better-sqlite3')).default;
+    const db = new Database(config.filename || ':memory:', { readonly: true });
 
     try {
-        await client.connect();
-        const db = client.db();
-        
-        const collections = await db.listCollections().toArray();
+        const tablesRes = db.prepare(
+            `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`
+        ).all() as Array<{ name: string }>;
+
         const tables: TableInfo[] = [];
 
-        for (const col of collections) {
-            // MongoDB is schemaless, so we just provide a basic placeholder for columns
-            const columns: ColumnInfo[] = [
-                {
-                    name: '_id',
-                    type: 'ObjectId',
-                    nullable: false,
-                    isPrimaryKey: true,
-                    isForeignKey: false,
-                }
-            ];
+        for (const table of tablesRes) {
+            const tableName = table.name;
+            const pragmaResult = db.prepare(`PRAGMA table_info("${tableName}")`).all() as Array<{
+                name: string; type: string; notnull: number; pk: number;
+            }>;
+            const fkResult = db.prepare(`PRAGMA foreign_key_list("${tableName}")`).all() as Array<{
+                from: string; table: string; to: string;
+            }>;
+            const fkMap = new Map(fkResult.map(fk => [fk.from, { table: fk.table, column: fk.to }]));
 
             let rowCount = 0;
             try {
-                rowCount = await db.collection(col.name).estimatedDocumentCount();
+                const countRes = db.prepare(`SELECT COUNT(*) as cnt FROM "${tableName}"`).get() as { cnt: number };
+                rowCount = countRes.cnt;
             } catch { /* ignore */ }
 
-            tables.push({ name: col.name, columns, rowCount });
+            const columns: ColumnInfo[] = pragmaResult.map(col => ({
+                name: col.name,
+                type: col.type || 'TEXT',
+                nullable: col.notnull === 0,
+                isPrimaryKey: col.pk > 0,
+                isForeignKey: fkMap.has(col.name),
+                references: fkMap.get(col.name),
+            }));
+
+            tables.push({ name: tableName, columns, rowCount });
         }
 
-        await client.close();
+        db.close();
         return {
             tables,
-            databaseType: 'mongodb',
-            databaseName: db.databaseName || 'mongodb',
+            databaseType: 'sqlite',
+            databaseName: config.filename || 'in-memory',
         };
     } catch (err) {
-        await client.close();
+        db.close();
         throw err;
     }
 }
@@ -213,8 +217,8 @@ export async function POST(req: NextRequest) {
             case 'postgresql':
                 schema = await getPostgreSQLSchema(config);
                 break;
-            case 'mongodb':
-                schema = await getMongoDBSchema(config);
+            case 'sqlite':
+                schema = await getSQLiteSchema(config);
                 break;
             default:
                 return NextResponse.json({ error: 'Unsupported database type' }, { status: 400 });

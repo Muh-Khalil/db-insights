@@ -2,9 +2,6 @@
 
 # dependencies
 /node_modules
-/cli/node_modules
-/npm-cache/*
-
 /.pnp
 .pnp.*
 .yarn/*
@@ -34,8 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env
-.env.local
+.env*
 
 # vercel
 .vercel
@@ -43,6 +39,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-config.bat
-temp_auto_push.bat
-temp_interactive_push.bat

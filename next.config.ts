@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     'mysql2',
     'pg',
+    'better-sqlite3',
   ],
 };
 

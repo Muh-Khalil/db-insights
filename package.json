@@ -9,11 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/pg": "^8.16.0",
     "axios": "^1.13.5",
+    "better-sqlite3": "^12.6.2",
     "lucide-react": "^0.575.0",
-    "mongodb": "^7.1.1",
     "mysql2": "^3.17.4",
     "next": "16.1.6",
     "pg": "^8.18.0",

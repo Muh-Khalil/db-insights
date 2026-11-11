@@ -1,8 +1,8 @@
 'use client';
 
 import { DatabaseConfig, DatabaseType } from '@/types';
-import { useState, useEffect } from 'react';
-import { Database, Server, Lock, Eye, EyeOff, TestTube, CheckCircle, XCircle, Loader2, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Database, Server, Lock, Eye, EyeOff, TestTube, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 interface DbConnectProps {
     onConnect: (config: DatabaseConfig, schema: unknown) => void;
@@ -12,14 +12,12 @@ interface DbConnectProps {
 const DB_DEFAULTS: Record<DatabaseType, Partial<DatabaseConfig>> = {
     mysql: { host: 'localhost', port: 3306 },
     postgresql: { host: 'localhost', port: 5432 },
-    mongodb: { uri: 'mongodb://localhost:27017' },
+    sqlite: {},
 };
 
-type DbCategory = 'relational' | 'non-relational';
 type TestStatus = 'idle' | 'testing' | 'success' | 'error';
 
 export function DbConnect({ onConnect, onDemoMode }: DbConnectProps) {
-    const [dbCategory, setDbCategory] = useState<DbCategory>('relational');
     const [dbType, setDbType] = useState<DatabaseType>('mysql');
     const [config, setConfig] = useState<DatabaseConfig>({ type: 'mysql', host: 'localhost', port: 3306 });
     const [showPwd, setShowPwd] = useState(false);
@@ -29,14 +27,6 @@ export function DbConnect({ onConnect, onDemoMode }: DbConnectProps) {
 
     const updateConfig = (updates: Partial<DatabaseConfig>) => {
         setConfig(prev => ({ ...prev, ...updates }));
-        setTestStatus('idle');
-    };
-
-    const handleCategoryChange = (category: DbCategory) => {
-        setDbCategory(category);
-        const newType = category === 'relational' ? 'mysql' : 'mongodb';
-        setDbType(newType);
-        setConfig({ type: newType, ...DB_DEFAULTS[newType] });
         setTestStatus('idle');
     };
 
@@ -60,7 +50,7 @@ export function DbConnect({ onConnect, onDemoMode }: DbConnectProps) {
 
             if (data.success) {
                 setTestStatus('success');
-                setTestMessage(`Connected! Found ${data.schema.tables.length} collections/tables.`);
+                setTestMessage(`Connected! Found ${data.schema.tables.length} tables.`);
             } else {
                 setTestStatus('error');
                 setTestMessage(data.error || 'Connection failed');
@@ -95,72 +85,56 @@ export function DbConnect({ onConnect, onDemoMode }: DbConnectProps) {
         }
     };
 
+    const dbTypes: Array<{ value: DatabaseType; label: string; color: string; logo: string }> = [
+        { value: 'mysql', label: 'MySQL', color: '#e38c57', logo: '🐬' },
+        { value: 'postgresql', label: 'PostgreSQL', color: '#336791', logo: '🐘' },
+        { value: 'sqlite', label: 'SQLite', color: '#003b57', logo: '🗃️' },
+    ];
+
     return (
-        <div className="w-full max-w-xl mx-auto">
-            {/* Database Category and Type Selectors */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="flex-1 min-w-0">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-2 px-1">
-                        Database Engine
-                    </label>
-                    <div className="relative">
-                        <select
-                            value={dbCategory}
-                            onChange={(e) => handleCategoryChange(e.target.value as DbCategory)}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none transition-all focus:border-blue-500/50 focus:bg-black/60 focus:ring-4 focus:ring-blue-500/10 cursor-pointer appearance-none"
-                        >
-                            <option value="relational">Relational</option>
-                            <option value="non-relational">Non-Relational</option>
-                        </select>
-                        <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                    </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                    <label className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-2 px-1">
-                        Database Type
-                    </label>
-                    <div className="relative">
-                        <select
-                            value={dbType}
-                            onChange={(e) => handleTypeChange(e.target.value as DatabaseType)}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 outline-none transition-all focus:border-blue-500/50 focus:bg-black/60 focus:ring-4 focus:ring-blue-500/10 cursor-pointer appearance-none"
-                        >
-                            {dbCategory === 'relational' ? (
-                                <>
-                                    <option value="mysql">MySQL</option>
-                                    <option value="postgresql">PostgreSQL</option>
-                                </>
-                            ) : (
-                                <option value="mongodb">MongoDB</option>
-                            )}
-                        </select>
-                        <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                    </div>
-                </div>
+        <div className="max-w-[560px] mx-auto">
+            {/* DB Type Selector */}
+            <div className="flex gap-2.5 mb-6">
+                {dbTypes.map(db => (
+                    <button
+                        key={db.value}
+                        onClick={() => handleTypeChange(db.value)}
+                        className={`flex-1 p-3 rounded-xl border transition-all duration-300 transform hover:-translate-y-1 ${dbType === db.value
+                            ? 'bg-blue-500/10 border-blue-500/30 shadow-lg shadow-blue-500/5 ring-1 ring-blue-500/20'
+                            : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                            }`}
+                    >
+                        <div className="text-2xl mb-1.5 grayscale-0 group-hover:scale-110 transition-transform">{db.logo}</div>
+                        <div className={`text-[11px] font-bold uppercase tracking-wider ${dbType === db.value ? 'text-blue-400' : 'text-slate-500'
+                            }`}>
+                            {db.label}
+                        </div>
+                    </button>
+                ))}
             </div>
 
             {/* Connection Form */}
-            <div className="glass-card p-5 border border-white/10 relative overflow-hidden">
+            <div className="glass-card p-6 border border-white/10 relative overflow-hidden">
                 {/* Decorative background glow */}
                 <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 
                 <div className="flex items-center gap-2 mb-6">
                     <Server size={16} className="text-blue-500" />
                     <span className="text-sm font-bold text-slate-200 uppercase tracking-wide">
-                        {dbType === 'mongodb' ? 'MongoDB URI' : 'Connection Details'}
+                        {dbType === 'sqlite' ? 'File Path' : 'Connection Details'}
                     </span>
                 </div>
 
-                {dbType === 'mongodb' ? (
+                {dbType === 'sqlite' ? (
                     <div className="mb-4">
                         <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-2 px-1">
-                            Connection String (URI)
+                            Database File Path
                         </label>
                         <input
                             className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-slate-200 outline-none transition-all duration-200 placeholder:text-slate-600 focus:border-blue-500/50 focus:bg-black/60 focus:ring-4 focus:ring-blue-500/10"
-                            placeholder="mongodb+srv://user:pass@cluster.mongodb.net/test"
-                            value={config.uri || ''}
-                            onChange={e => updateConfig({ uri: e.target.value })}
+                            placeholder="C:\path\to\database.db or /path/to/database.db"
+                            value={config.filename || ''}
+                            onChange={e => updateConfig({ filename: e.target.value })}
                         />
                     </div>
                 ) : (
@@ -235,14 +209,14 @@ export function DbConnect({ onConnect, onDemoMode }: DbConnectProps) {
                                 </div>
                             </div>
                         </div>
-                     </div>
+                    </div>
                 )}
 
                 {/* Security note */}
                 <div className="flex items-start gap-2.5 mt-6 p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 transition-colors hover:bg-blue-500/10">
                     <Lock size={12} className="text-blue-500 mt-0.5 shrink-0" />
                     <p className="text-[11px] leading-relaxed text-slate-400 font-medium">
-                        Credentials stay local — only <span className="text-blue-400 font-bold">READ</span> queries are executed. No data is sent externally.
+                        Credentials stay local — only <span className="text-blue-400 font-bold">SELECT</span> queries are executed. No data is sent externally.
                     </p>
                 </div>
 

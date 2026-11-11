@@ -84,8 +84,32 @@ async function executePostgreSQLQuery(sql: string, config: DatabaseConfig): Prom
     }
 }
 
-async function executeMongoDBQuery(sql: string, config: DatabaseConfig): Promise<QueryResult> {
-    throw new Error('Query execution for MongoDB is not currently supported via SQL. Support coming soon.');
+async function executeSQLiteQuery(sql: string, config: DatabaseConfig): Promise<QueryResult> {
+    const Database = (await import('better-sqlite3')).default;
+    const db = new Database(config.filename || ':memory:', { readonly: true });
+
+    const start = Date.now();
+
+    try {
+        const stmt = db.prepare(sql);
+        const rows = stmt.all() as Record<string, unknown>[];
+        const executionTimeMs = Date.now() - start;
+
+        const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+        const limitedRows = rows.slice(0, MAX_ROWS);
+
+        db.close();
+
+        return {
+            columns,
+            rows: limitedRows,
+            rowCount: rows.length,
+            executionTimeMs,
+        };
+    } catch (err) {
+        db.close();
+        throw err;
+    }
 }
 
 // Re-implement validation inline to avoid cross-route import issues
@@ -135,8 +159,8 @@ export async function POST(req: NextRequest) {
             case 'postgresql':
                 result = await executePostgreSQLQuery(sql, config);
                 break;
-            case 'mongodb':
-                result = await executeMongoDBQuery(sql, config);
+            case 'sqlite':
+                result = await executeSQLiteQuery(sql, config);
                 break;
             default:
                 return NextResponse.json({ error: 'Unsupported database type' }, { status: 400 });

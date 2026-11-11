@@ -1,6 +1,6 @@
 // ===== Core Types for DB Insights =====
 
-export type DatabaseType = 'mysql' | 'postgresql' | 'mongodb';
+export type DatabaseType = 'mysql' | 'postgresql' | 'sqlite';
 
 export type LLMProvider = 'groq' | 'gemini' | 'openrouter';
 
@@ -11,7 +11,7 @@ export interface DatabaseConfig {
     username?: string;
     password?: string;
     database?: string;
-    uri?: string; // for MongoDB
+    filename?: string; // for SQLite
 }
 
 export interface ColumnInfo {
